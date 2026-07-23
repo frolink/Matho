@@ -1,0 +1,43 @@
+{
+  "name": "@matho/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MATHO — buyer/creator/merchant web app (Next.js App Router).",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "clean": "rm -rf .next dist coverage playwright-report *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@matho/shared": "*",
+    "@matho/types": "*",
+    "@matho/sdk": "*",
+    "@matho/ui": "*",
+    "@tanstack/react-query": "^5.56.2",
+    "next": "^14.2.13",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.2",
+    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/react": "^16.0.1",
+    "@types/node": "^20.16.5",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "eslint-config-next": "^14.2.13",
+    "jsdom": "^25.0.0",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.11",
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.1"
+  }
+}

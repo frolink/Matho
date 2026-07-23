@@ -1,0 +1,40 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# build outputs
+.next/
+dist/
+build/
+out/
+
+# turbo
+.turbo/
+
+# testing
+coverage/
+playwright-report/
+test-results/
+
+# env
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# logs
+npm-debug.log*
+*.log
+
+# misc
+.DS_Store
+*.pem
+.vscode/*
+!.vscode/extensions.json
+
+# prisma
+packages/database/generated/
+
+# typescript
+*.tsbuildinfo
