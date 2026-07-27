@@ -14,7 +14,7 @@ npm install
 cp .env.example .env
 docker compose -f docker-compose.dev.yml up -d
 npm run db:generate
-npm run db:migrate
+npm run db:push
 npm run db:seed
 ```
 
@@ -31,8 +31,19 @@ Or all at once with `npm run dev` (Turborepo runs them in parallel).
 ## Working with the database
 
 - Schema lives in `packages/database/prisma/schema.prisma`.
-- After editing the schema: `npm run db:migrate` (creates + applies a
-  migration) then `npm run db:generate` (regenerates the typed client).
+- **This repo has no Prisma migration history yet** (Phase 1 foundation was
+  never run against a live database). Until you create the first migration,
+  use `npm run db:push` to sync the schema directly to your database — it's
+  simpler and has no migration files to manage.
+- When you're ready to start real migration history (recommended before
+  going to production): run `npm run db:migrate` once — it will prompt you
+  for a migration name (e.g. `init`) and create
+  `packages/database/prisma/migrations/`. From then on:
+  - Local development: `npm run db:migrate` (creates + applies a migration)
+  - CI/production: `npm run db:migrate:deploy` (applies existing migrations,
+    non-interactive — never creates new ones)
+- After any schema change: `npm run db:generate` regenerates the typed
+  Prisma client.
 - `npm run db:studio` opens Prisma Studio against your local database.
 - `npm run db:seed` re-runs `packages/database/prisma/seed.ts` (currently
   seeds only the `Language` reference table — no demo business data).

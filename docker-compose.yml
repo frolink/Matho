@@ -1,9 +1,13 @@
 version: '3.9'
 
-# MATHO — local development stack.
-# `docker compose up` boots Postgres, Redis, the API, and both web apps.
-# The Postgres/Redis services are also useful standalone while running
-# `npm run dev` on the host for faster local iteration.
+# MATHO — one-command local/production-style stack.
+# `docker compose up --build` boots Postgres, Redis, runs database
+# migrations once, then starts the API and both web apps.
+#
+# Beginner-friendly quick start — see docs/DEPLOYMENT.md for the full guide:
+#   1. cp .env.example .env        (edit JWT_SECRET before real deployments)
+#   2. docker compose up --build
+#   3. Open http://localhost:3000  (web)  and  http://localhost:3002  (admin)
 
 services:
   postgres:
@@ -38,6 +42,28 @@ services:
       timeout: 5s
       retries: 10
 
+  # One-off job: syncs the Prisma schema to Postgres, then exits. `api`
+  # waits for this to finish successfully before it starts — so the
+  # database schema is always up to date on every `docker compose up`.
+  migrate:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: builder
+    container_name: matho-migrate
+    restart: 'no'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-matho}:${POSTGRES_PASSWORD:-matho_dev_password}@postgres:5432/${POSTGRES_DB:-matho_dev}?schema=public
+    working_dir: /repo
+    # NOTE: this repo has no Prisma migration history yet (Phase 1 foundation).
+    # `db push` syncs the schema directly — safe for first deploys. Once you've
+    # run `npm run db:migrate` locally to create a real migration, switch this
+    # to `npm run db:migrate:deploy` instead. See docs/DEVELOPER_GUIDE.md.
+    command: sh -c "npm run db:push && npm run db:seed"
+
   api:
     build:
       context: .
@@ -49,27 +75,44 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     environment:
       NODE_ENV: production
       DATABASE_URL: postgresql://${POSTGRES_USER:-matho}:${POSTGRES_PASSWORD:-matho_dev_password}@postgres:5432/${POSTGRES_DB:-matho_dev}?schema=public
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET:-replace-with-a-long-random-secret}
-      CORS_ORIGINS: http://localhost:3000,http://localhost:3002
+      JWT_ACCESS_TTL: ${JWT_ACCESS_TTL:-15m}
+      JWT_REFRESH_TTL: ${JWT_REFRESH_TTL:-30d}
+      PI_API_BASE_URL: ${PI_API_BASE_URL:-https://api.minepi.com/v2}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:3002}
       PORT: 4000
     ports:
       - '4000:4000'
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://localhost:4000/api/v1/health || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   web:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      args:
+        # Baked into the browser bundle at BUILD time — must be the URL
+        # your browser can actually reach (a real domain in production).
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000}
+        NEXT_PUBLIC_PI_SANDBOX: ${NEXT_PUBLIC_PI_SANDBOX:-true}
     container_name: matho-web
     restart: unless-stopped
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     environment:
       NODE_ENV: production
-      NEXT_PUBLIC_API_URL: http://localhost:4000
+      # Server-side (Route Handlers) → reach the API over the Docker network.
+      API_INTERNAL_URL: http://api:4000
     ports:
       - '3000:3000'
 
@@ -77,13 +120,16 @@ services:
     build:
       context: .
       dockerfile: apps/admin/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000}
     container_name: matho-admin
     restart: unless-stopped
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     environment:
       NODE_ENV: production
-      NEXT_PUBLIC_API_URL: http://localhost:4000
+      API_INTERNAL_URL: http://api:4000
     ports:
       - '3002:3002'
 

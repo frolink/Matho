@@ -9,9 +9,10 @@ monorepo skeleton with no business logic yet. Every app builds, lints, and tests
 successfully; feature work starts on top of this.
 
 > 📄 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for diagrams and design
-> rationale, [`docs/DEVELOPER_GUIDE.md`](docs/DEVELOPER_GUIDE.md) for day-to-day
-> workflows, and [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) for how to
-> contribute.
+> rationale, [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for a beginner-friendly
+> deployment guide (Bahasa Indonesia), [`docs/DEVELOPER_GUIDE.md`](docs/DEVELOPER_GUIDE.md)
+> for day-to-day workflows, and [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md)
+> for how to contribute.
 
 ## Stack
 
@@ -50,6 +51,14 @@ matho/
 
 ## Quick start
 
+**Baru pertama kali dan belum familiar dengan Node.js/Docker?** Ikuti
+[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) — panduan langkah demi langkah
+dalam Bahasa Indonesia, termasuk script `./scripts/setup.sh` yang menjalankan
+semuanya otomatis dengan satu perintah, plus cara deploy online gratis lewat
+Vercel + Railway tanpa perlu mengelola server sendiri.
+
+Ringkasan cepat untuk yang sudah familiar dengan Node.js:
+
 ```bash
 # 1. Install dependencies
 npm install
@@ -60,18 +69,20 @@ cp .env.example .env
 # 3. Start Postgres + Redis
 docker compose -f docker-compose.dev.yml up -d
 
-# 4. Generate the Prisma client and run migrations
+# 4. Sync the Prisma schema to your database (no migration history yet)
 npm run db:generate
-npm run db:migrate
+npm run db:push
 npm run db:seed
 
 # 5. Start every app in parallel (web:3000, admin:3002, api:4000)
 npm run dev
 ```
 
-Or run everything containerized:
+Or run everything containerized (recommended for beginners):
 
 ```bash
+./scripts/setup.sh
+# — or, equivalently —
 docker compose up --build
 ```
 

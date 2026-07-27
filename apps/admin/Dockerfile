@@ -28,6 +28,13 @@ FROM base AS builder
 COPY --from=deps /repo/node_modules ./node_modules
 COPY . .
 RUN npm run db:generate
+
+# NEXT_PUBLIC_* vars are inlined into the browser bundle at BUILD time, not
+# read at container runtime — must be passed as a build arg (see
+# docker-compose.yml's `admin.build.args`), not as regular `environment:`.
+ARG NEXT_PUBLIC_API_URL=http://localhost:4000
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
 RUN npx turbo run build --filter=@matho/admin
 
 # ---- runner: minimal production image ----
