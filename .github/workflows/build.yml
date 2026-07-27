@@ -18,10 +18,13 @@ jobs:
           cache: npm
 
       - run: npm install
+
       - run: npm run db:generate
 
       - run: ls -R packages/database/generated || true
+
       - run: grep -n "UserRole" packages/database/generated/client/index.d.ts || true
+
       - run: sed -n '1,40p' apps/api/src/modules/auth/auth.types.ts
 
       - run: npm run build
