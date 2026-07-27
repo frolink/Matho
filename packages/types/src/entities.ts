@@ -12,13 +12,7 @@
 export type ID = string;
 export type ISODateString = string;
 
-export enum UserRole {
-  BUYER = 'BUYER',
-  MERCHANT = 'MERCHANT',
-  CREATOR = 'CREATOR',
-  AFFILIATE = 'AFFILIATE',
-  ADMIN = 'ADMIN',
-}
+export type UserRole = 'BUYER' | 'MERCHANT' | 'CREATOR' | 'AFFILIATE' | 'ADMIN';
 
 export enum OrderStatus {
   PENDING = 'PENDING',
