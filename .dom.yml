@@ -1,0 +1,47 @@
+# MATHO — DOM Cloud deployment recipe for apps/web
+#
+# This follows DOM Cloud's official Next.js recipe convention
+# (https://domcloud.co/docs/deployment/node — "This is a typical deployment
+# script for Next.js"), adapted for MATHO's monorepo: apps/web is deployed
+# from a subdirectory of this repo rather than the repo root, and every
+# command uses npm (not yarn).
+#
+# How to use:
+#   1. In the DOM Cloud dashboard, connect this repository (or push its
+#      contents to your site's ~/public_html via git/SFTP).
+#   2. Paste this file's content into the site's "Deployment Script" tab,
+#      or keep it as `.dom.yml` at the repo root if your account supports
+#      reading it automatically from the repo.
+#   3. Deploy. DOM Cloud will run `commands` from ~/public_html, then start
+#      the app with `app_start_command`.
+#
+# Reference: https://domcloud.co/docs/deployment/node
+#            https://domcloud.co/docs/deployment/nginx
+
+features:
+  - node lts # or pin an exact version, e.g. "node 20"
+
+nginx:
+  # Next.js's own `public/` folder lives inside apps/web — NGINX serves
+  # static files straight from there. Passenger starts the app from the
+  # PARENT of this directory by default, i.e. public_html/apps/web, which
+  # is exactly where apps/web's package.json and `npm start` live.
+  root: public_html/apps/web/public
+  passenger:
+    enabled: "on"
+    # $PORT is injected by DOM Cloud. apps/web's "start" script
+    # (`next start -p ${PORT:-3000}`) reads it — see apps/web/package.json.
+    app_start_command: env PORT=$PORT npm start
+
+locations:
+  # Let NGINX serve Next.js's hashed build assets directly instead of
+  # proxying them through the Node process — DOM Cloud's own recommended
+  # optimization for Next.js apps.
+  - match: /_next/static/
+    alias: public_html/apps/web/.next/static/
+
+commands:
+  # Runs from ~/public_html (the repo root). Everything is scoped to
+  # apps/web — it never touches the rest of the monorepo, which is what
+  # makes apps/web independently deployable here.
+  - cd apps/web && npm install && npm run build
