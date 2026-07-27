@@ -1,4 +1,4 @@
-import type { UserRole } from '@matho/types';
+import type { UserRole } from '@matho/database';
 
 /** Public-facing user shape returned to the frontend after login. */
 export interface AuthenticatedUser {

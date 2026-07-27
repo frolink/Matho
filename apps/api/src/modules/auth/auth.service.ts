@@ -1,10 +1,10 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
+import type { ConfigService } from '@nestjs/config';
+import type { JwtService } from '@nestjs/jwt';
 import { PiTokenVerificationError, verifyPiAccessToken } from '@matho/sdk';
 import type { PiAuthResult } from '@matho/sdk';
-import { UserRole } from '@matho/types';
-import { PrismaService } from '../../prisma/prisma.service';
+import { UserRole } from '@matho/database';
+import type { PrismaService } from '../../prisma/prisma.service';
 import type { AuthSessionResult, AuthTokens, MathoJwtPayload } from './auth.types';
 
 /**
