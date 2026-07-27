@@ -1,0 +1,19 @@
+source:
+  url: https://github.com/frolink/Matho.git
+  type: clone
+  shallow: true
+
+features:
+- node 20
+- postgresql
+
+nginx:
+  passenger:
+    enabled: on
+    app_start_command: npm --workspace=@matho/api run start
+    app_root: public_html
+
+commands:
+- npm install
+- npm run db:generate
+- npx turbo run build --filter=@matho/api
