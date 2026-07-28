@@ -14,9 +14,9 @@
     "clean": "rm -rf .next dist coverage playwright-report *.tsbuildinfo"
   },
   "dependencies": {
+    "@matho/sdk": "*",
     "@matho/shared": "*",
     "@matho/types": "*",
-    "@matho/sdk": "*",
     "@matho/ui": "*",
     "@tanstack/react-query": "^5.56.2",
     "next": "^14.2.13",
@@ -25,6 +25,7 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@next/swc-android-arm-eabi": "^13.2.4",
     "@playwright/test": "^1.47.2",
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^16.0.1",
