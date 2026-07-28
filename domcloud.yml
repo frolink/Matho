@@ -4,8 +4,8 @@ source:
   shallow: true
 
 features:
-- node 20
-- postgresql
+  - node lts
+  - postgresql
 
 nginx:
   passenger:
@@ -14,7 +14,6 @@ nginx:
     app_root: .
 
 commands:
-- npm install
-- npm run db:generate
-- npx turbo run build --filter=@matho/api
-
+  - cd $HOME && npm install --ignore-scripts --no-audit --no-fund
+  - cd $HOME && npm run db:generate
+  - cd $HOME && npx turbo run build --filter=@matho/api
