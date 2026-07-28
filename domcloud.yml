@@ -11,9 +11,10 @@ nginx:
   passenger:
     enabled: on
     app_start_command: npm --workspace=@matho/api run start
-    app_root: public_html
+    app_root: .
 
 commands:
 - npm install
 - npm run db:generate
 - npx turbo run build --filter=@matho/api
+
