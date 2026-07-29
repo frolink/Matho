@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  prisma:
+  api-build:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,3 +35,22 @@ jobs:
         run: |
           echo "=== CLIENT ==="
           ls packages/database/generated/client || true
+
+      - name: Build API
+        run: npm --workspace=@matho/api run build
+
+      - name: Check API dist
+        run: |
+          echo "=== API DIST ==="
+          ls -R apps/api/dist || true
+
+      - name: Upload API artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: matho-api-build
+          path: |
+            apps/api/dist
+            apps/api/package.json
+            packages/database
+            package.json
+            package-lock.json
