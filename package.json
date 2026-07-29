@@ -54,5 +54,14 @@
     "*.{ts,tsx,js,jsx,json,md,css}": [
       "prettier --write"
     ]
+  },
+  "allowScripts": {
+    "@nestjs/core@10.4.22": true,
+    "@prisma/client@5.19.1": true,
+    "@prisma/engines@5.19.1": true,
+    "esbuild@0.21.5": true,
+    "esbuild@0.28.1": true,
+    "prisma@5.19.1": true,
+    "unrs-resolver@1.12.2": true
   }
 }
