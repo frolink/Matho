@@ -9,6 +9,6 @@ nginx:
     app_start_command: env PORT=$PORT npm start
 
 commands:
-  - cd apps/web
   - npm install
+  - cd apps/web
   - npm run build
