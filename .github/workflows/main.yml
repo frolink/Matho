@@ -8,43 +8,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
 
-      - name: Install
+      - name: Install dependencies
         run: npm install
 
       - name: Generate Prisma Client
-        run: npm run db:generate
+        run: npm --workspace=@matho/database run generate
 
-      - name: Check generated files
+      - name: Check Prisma Generated Client
         run: |
+          echo "=== DATABASE PACKAGE ==="
+          ls -la packages/database
+
           echo "=== GENERATED ==="
           ls -R packages/database/generated || true
 
-      - name: Check exports
+      - name: Check Database Exports
         run: |
-          echo "=== INDEX ==="
+          echo "=== DATABASE INDEX ==="
           cat packages/database/src/index.ts
 
-      - name: Check client
-        run: |
-          echo "=== CLIENT ==="
-          ls packages/database/generated/client || true
+          echo "=== DATABASE CLIENT ==="
+          cat packages/database/src/client.ts
 
       - name: Build API
         run: npm --workspace=@matho/api run build
 
-      - name: Check API dist
+      - name: Check API Build Output
         run: |
           echo "=== API DIST ==="
           ls -R apps/api/dist || true
 
-      - name: Upload API artifact
+      - name: Upload API Artifact
         uses: actions/upload-artifact@v4
         with:
           name: matho-api-build
