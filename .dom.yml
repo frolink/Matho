@@ -1,80 +1,14 @@
-# MATHO — DOM Cloud deployment recipe for the FULL Turborepo monorepo
-# (apps/web + apps/api + packages/database/Prisma), all on ONE site.
-#
-# Independent from Docker: this file is only read by DOM Cloud's own
-# deployment system. `docker compose` never reads it, and this recipe
-# never touches ports 3000/3002/4000/5432/6379 used by docker-compose.yml
-# — so both can coexist in the repo without conflicting.
-#
-# IMPORTANT — Passenger constraint: DOM Cloud only supervises ONE
-# long-running app per site (https://domcloud.co/docs/deployment/nginx —
-# "only one app is spawned per website configuration"). So:
-#   - apps/web (Next.js)  -> the Passenger-supervised app (auto-restarts,
-#                            spins up on demand, survives crashes).
-#   - apps/api (NestJS)   -> started as a plain background process via
-#                            `nohup` in `commands`, reverse-proxied at
-#                            /api/. This is best-effort: unlike apps/web,
-#                            it is NOT auto-restarted by Passenger if it
-#                            crashes. If you need real supervision for the
-#                            API, deploy it as its own DOM Cloud site/
-#                            subdomain instead (it then becomes the
-#                            Passenger-supervised app there) — or keep
-#                            using Render/Railway for it, as in
-#                            docs/DEPLOYMENT.md Jalur B.
-#
-# Reference: https://domcloud.co/docs/deployment/node
-#            https://domcloud.co/docs/deployment/nginx
-
 features:
   - node lts
-  # Uncomment if you want DOM Cloud's built-in PostgreSQL instead of an
-  # external provider like Neon (see docs/DEPLOYMENT.md Jalur B):
-  # - postgresql
 
 nginx:
-  # Next.js's public/ folder lives inside apps/web. Passenger starts the
-  # app from the PARENT of this path by default — public_html/apps/web —
-  # which is exactly where apps/web's package.json and `npm start` live.
-  root: public_html/apps/web/public
+  root: apps/web/public
+
   passenger:
     enabled: "on"
-    # $PORT is injected by DOM Cloud for the Passenger-managed app only.
-    # apps/web's "start" script reads it: next start -p ${PORT:-3000}
     app_start_command: env PORT=$PORT npm start
-    env_var_list:
-      - NODE_ENV=production
-      # apps/web talks to the NestJS API through the /api/ proxy below,
-      # so both the public and internal URL are just this site itself.
-      - NEXT_PUBLIC_API_URL=/api
-      - API_INTERNAL_URL=http://127.0.0.1:4000
-
-locations:
-  # Let NGINX serve Next.js's hashed build assets directly instead of
-  # proxying them through the Node process.
-  - match: /_next/static/
-    alias: public_html/apps/web/.next/static/
-  # Reverse-proxy the NestJS API (see the background process started in
-  # `commands` below) — reachable publicly at https://yourdomain/api/...
-  - match: /api/
-    proxy_pass: http://127.0.0.1:4000/
 
 commands:
-  # Runs from ~/public_html (repo root). Installing here (not scoped to
-  # one app) is intentional: Turborepo needs the whole monorepo graph to
-  # build apps/web and apps/api in the correct dependency order.
+  - cd apps/web
   - npm install
-
-  # Prisma client + schema sync for packages/database. Set DATABASE_URL
-  # via this site's environment variables (Setup -> Environment) first —
-  # either DOM Cloud's own PostgreSQL feature above, or an external one.
-  - npm run db:generate
-  - npm run db:push
-
-  # Build only what's needed for this deployment, respecting the
-  # Turborepo dependency graph (packages/* build before the apps).
-  - npx turbo run build --filter=@matho/web --filter=@matho/api
-
-  # (Re)start the NestJS API in the background. The `pkill` first prevents
-  # duplicate processes piling up on every redeploy.
-  - pkill -f "dist/main.js" || true
-  - cd apps/api && NODE_ENV=production PORT=4000 nohup node dist/main.js > ~/api.log 2>&1 & disown
+  - npm run build
