@@ -42,6 +42,14 @@ jobs:
       - name: Build API
         run: npm --workspace=@matho/api run build
 
+      - name: Find Build Output
+        run: |
+          echo "=== SEARCH DIST ==="
+          find . -type d -name dist
+
+          echo "=== SEARCH MAIN JS ==="
+          find . -type f -name main.js
+
       - name: Check API Build Output
         run: |
           echo "=== API DIST ==="
@@ -52,8 +60,7 @@ jobs:
         with:
           name: matho-api-build
           path: |
-            apps/api/dist
-            apps/api/package.json
-            packages/database
+            apps/api/**
+            packages/database/**
             package.json
             package-lock.json
