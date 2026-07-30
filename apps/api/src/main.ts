@@ -8,6 +8,7 @@ import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 async function bootstrap() {
+  console.log('DATABASE_URL =', process.env.DATABASE_URL);
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
 
@@ -39,9 +40,9 @@ async function bootstrap() {
 
   const port = config.get<number>('app.port') ?? 4000;
   await app.listen(port);
-  // eslint-disable-next-line no-console
+   
   console.info(`[matho-api] listening on http://localhost:${port}/api/v1`);
-  // eslint-disable-next-line no-console
+   
   console.info(`[matho-api] swagger docs at http://localhost:${port}/api/docs`);
 }
 

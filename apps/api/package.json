@@ -4,7 +4,7 @@
   "private": true,
   "description": "MATHO — NestJS backend API (Auth, Users, Merchant, Products, Orders, Payments, Live, Affiliate, Notifications, Admin).",
   "scripts": {
-    "build": "nest build",
+    "build": "tsc -p tsconfig.build.json",
     "dev": "nest start --watch",
     "start": "node dist/main",
     "start:debug": "nest start --debug --watch",

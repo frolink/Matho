@@ -36,7 +36,9 @@ describe('AuthService', () => {
         },
         {
           provide: ConfigService,
-          useValue: { get: jest.fn((key: string) => ({ JWT_SECRET: 'test-secret' })[key] ?? '15m') },
+          useValue: {
+            get: jest.fn((key: string) => ({ JWT_SECRET: 'test-secret' })[key] ?? '15m'),
+          },
         },
       ],
     }).compile();
@@ -55,7 +57,7 @@ describe('AuthService', () => {
     prisma.client.user.upsert.mockResolvedValue({
       id: 'user-1',
       piUid: 'pi-uid-123',
-      role: UserRole.BUYER,
+      role: 'BUYER',
       profile: { displayName: 'pioneer_jane' },
     });
 

@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { join } from 'path';
+
 import appConfig from './config/app.config';
 import { PrismaModule } from './prisma/prisma.module';
 import { AppController } from './app.controller';
@@ -18,8 +20,14 @@ import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [appConfig] }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '../../.env',
+      load: [appConfig],
+    }),
+
     PrismaModule,
+
     AuthModule,
     UsersModule,
     MerchantModule,
