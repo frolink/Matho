@@ -1,14 +1,18 @@
+source: https://github.com/frolink/Matho
+
 features:
   - node lts
+  - postgresql
+  - redis
+  - ssl
 
 nginx:
   root: apps/web/public
 
   passenger:
     enabled: "on"
-    app_start_command: env PORT=$PORT npm start
+    app_start_command: env PORT=$PORT npm --workspace=@matho/web start
 
 commands:
   - npm install
-  - cd apps/web
-  - npm run build
+  - npm --workspace=@matho/web run build
