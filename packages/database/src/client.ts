@@ -1,11 +1,11 @@
-import { PrismaClient } from '../generated/client';
+import { PrismaClient } from '../generated/client/index.js';
 
 /**
  * Singleton PrismaClient — prevents exhausting the PostgreSQL connection
  * pool from hot-reloads in development (a common Next.js/Nest dev pitfall).
  */
 declare global {
-  // eslint-disable-next-line no-var
+   
   var __mathoPrisma: PrismaClient | undefined;
 }
 
