@@ -3,7 +3,6 @@ source: https://github.com/frolink/Matho
 features:
   - node lts
   - postgresql
-  - redis
   - ssl
 
 nginx:
