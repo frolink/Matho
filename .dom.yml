@@ -2,7 +2,6 @@ source: https://github.com/frolink/Matho
 
 features:
   - node lts
-  - postgresql
   - ssl
 
 nginx:
@@ -13,4 +12,4 @@ nginx:
 commands:
   - npm install
   - npm run db:generate
-  - npm --workspace=@matho/api run build
+  - npx turbo run build --filter=@matho/api
